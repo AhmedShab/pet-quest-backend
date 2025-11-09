@@ -1,0 +1,73 @@
+const Task = require('../models/taskModel');
+const Pet = require('../models/petModel');
+
+// Create a new task
+exports.createTask = async (req, res) => {
+  try {
+    const task = await Task.create(req.body);
+    res.status(201).json(task);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// Get all tasks (optionally filter by petId or type)
+exports.getTasks = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.petId) filter.petId = req.query.petId;
+    if (req.query.type) filter.type = req.query.type;
+
+    const tasks = await Task.find(filter).populate('petId');
+    res.status(200).json(tasks);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Update a task (e.g., change due date or type)
+exports.updateTask = async (req, res) => {
+  try {
+    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+    res.status(200).json(task);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// Mark task as complete and update pet XP
+exports.completeTask = async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+
+    if (task.completed) {
+      return res.status(400).json({ error: 'Task already completed' });
+    }
+
+    task.completed = true;
+    await task.save();
+
+    const pet = await Pet.findById(task.petId);
+    pet.xp += task.xpReward;
+    await pet.save();
+
+    res.status(200).json({ message: 'Task completed', task, pet });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Delete a task
+exports.deleteTask = async (req, res) => {
+  try {
+    const task = await Task.findByIdAndDelete(req.params.id);
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+    res.status(200).json({ message: 'Task deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
