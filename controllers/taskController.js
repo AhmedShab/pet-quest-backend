@@ -14,16 +14,22 @@ exports.createTask = async (req, res) => {
 // Get all tasks (optionally filter by petId or type)
 exports.getTasks = async (req, res) => {
   try {
-    const filter = {};
-    if (req.query.petId) filter.petId = req.query.petId;
-    if (req.query.type) filter.type = req.query.type;
-
-    const tasks = await Task.find(filter).populate('petId');
+    const tasks = await Task.find();
     res.status(200).json(tasks);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getTasksByPet = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const tasks = await Task.find({ petId: id })
+    res.status(200).json(tasks);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
 
 // Update a task (e.g., change due date or type)
 exports.updateTask = async (req, res) => {
