@@ -1,5 +1,6 @@
 const Task = require('../models/taskModel');
 const Pet = require('../models/petModel');
+const { computeLevel } = require('../helpers/level');
 
 // Create a new task
 exports.createTask = async (req, res) => {
@@ -59,6 +60,7 @@ exports.completeTask = async (req, res) => {
 
     const pet = await Pet.findById(task.petId);
     pet.xp += task.xpReward;
+    pet.level = computeLevel(pet.xp);
     await pet.save();
 
     res.status(200).json({ message: 'Task completed', task, pet });
