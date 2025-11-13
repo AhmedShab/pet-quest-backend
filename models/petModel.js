@@ -6,7 +6,8 @@ const petSchema = new mongoose.Schema({
   avatarUrl: String,
   xp: { type: Number, default: 0 },
   mood: { type: String, default: 'neutral' },
-  level: { type: Number, default: 1 }
+  level: { type: Number, default: 1 },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
 module.exports = mongoose.model('Pet', petSchema);

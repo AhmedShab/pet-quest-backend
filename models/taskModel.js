@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
-  petId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pet' },
-  type: String, // e.g., 'feed', 'clean', 'play'
-  dueDate: Date,
+  petType: String, // 'cat', 'guineaPig', etc.
+  type: String, // 'feed', 'clean', 'play', 'refill'
+  timeOfDay: String, // 'morning', 'evening'
   completed: { type: Boolean, default: false },
-  xpReward: Number
+  xpReward: Number,
+  label: String,
+  date: { type: Date, default: () => new Date() }
 });
 
 module.exports = mongoose.model('Task', taskSchema);

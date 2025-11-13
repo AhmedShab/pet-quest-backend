@@ -23,7 +23,7 @@ exports.getPetById = async (req, res) => {
 
 exports.createPet = async (req, res) => {
   try {
-    const pet = await Pet.create(req.body);
+    const pet = await Pet.create({ ...req.body, owner: req.user.userId });
     res.status(201).json(pet);
   } catch (err) {
     res.status(400).json({ error: err.message });
