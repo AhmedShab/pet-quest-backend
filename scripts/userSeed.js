@@ -15,6 +15,7 @@ const users = [
     username: 'ahmed',
     email: 'test@example.com',
     password: '1234',
+    pets: ['69144e1773fefc7428506696', '69144e1c73fefc7428506698', '69144e2073fefc742850669a', '69144e4473fefc742850669c', '69144e5073fefc742850669e'],
   },
   {
     username: 'catLover',
@@ -49,6 +50,7 @@ async function seedUsers() {
         username: userData.username,
         email: userData.email,
         password: hashedPassword,
+        pets: userData.pets,
       });
 
       console.log(`Created user ${userData.email}`);

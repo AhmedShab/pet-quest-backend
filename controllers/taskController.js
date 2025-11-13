@@ -5,7 +5,7 @@ const { computeLevel } = require('../helpers/level');
 // Create a new task
 exports.createTask = async (req, res) => {
   try {
-    const task = await Task.create(req.body);
+    const task = await Task.create({ ...req.body, user: req.user.userId });
     res.status(201).json(task);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -17,7 +17,7 @@ exports.getTasks = async (req, res) => {
   const { petType } = req.params;
   
   try {
-    const tasks = await Task.find({ petType });
+    const tasks = await Task.find({ petType, user: req.user.userId });
     res.status(200).json(tasks);
   } catch (err) {
     res.status(500).json({ error: err.message });

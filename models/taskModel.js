@@ -7,7 +7,8 @@ const taskSchema = new mongoose.Schema({
   completed: { type: Boolean, default: false },
   xpReward: Number,
   label: String,
-  date: { type: Date, default: () => new Date() }
+  date: { type: Date, default: () => new Date() },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 });
 
 module.exports = mongoose.model('Task', taskSchema);
