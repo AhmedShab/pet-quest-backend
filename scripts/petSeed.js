@@ -10,7 +10,16 @@ const Pet = require('../models/petModel');
 
 const TARGET_EMAIL = process.env.SEED_OWNER_EMAIL || 'test@example.com';
 
-async function assignPetsToUser() {
+// Default pets to create (reset to start)
+const DEFAULT_PETS = [
+  { name: 'Midnight', species: 'cat', avatarUrl: 'avatars/cacao.png' },
+  { name: 'Cloud', species: 'cat', avatarUrl: 'avatars/cacao.png' },
+  { name: 'Cacao', species: 'cat', avatarUrl: 'avatars/cacao.png' },
+  { name: 'Yoko', species: 'cat', avatarUrl: 'avatars/cacao.png' },
+  { name: 'Shadow', species: 'cat', avatarUrl: 'avatars/cacao.png' },
+];
+
+async function resetPetsForUser() {
   try {
     if (!process.env.MONGO_URI) {
       throw new Error('MONGO_URI is not defined in your environment');
@@ -23,15 +32,22 @@ async function assignPetsToUser() {
       throw new Error(`User with email ${TARGET_EMAIL} not found`);
     }
 
-    const filter = {
-      $or: [{ owner: { $exists: false } }, { owner: null }],
-    };
+    // Delete all existing pets owned by this user
+    const deleteResult = await Pet.deleteMany({ owner: user._id });
+    console.log(`Deleted ${deleteResult.deletedCount} existing pets for ${TARGET_EMAIL}`);
 
-    const result = await Pet.updateMany(filter, { owner: user._id });
+    // Create new pets from scratch (xp: 0, level: 1, mood: 'neutral')
+    const newPets = [];
+    for (const petData of DEFAULT_PETS) {
+      const pet = await Pet.create({
+        ...petData,
+        owner: user._id,
+      });
+      newPets.push(pet);
+      console.log(`Created pet: ${pet.name} (${pet.species})`);
+    }
 
-    console.log(
-      `Assigned owner ${TARGET_EMAIL} to ${result.modifiedCount} of ${result.matchedCount} pets needing owners`
-    );
+    console.log(`Created ${newPets.length} new pets for ${TARGET_EMAIL}`);
   } catch (err) {
     console.error('Pet seeding failed:', err);
     throw err;
@@ -41,7 +57,7 @@ async function assignPetsToUser() {
   }
 }
 
-assignPetsToUser()
+resetPetsForUser()
   .then(() => console.log('Pet seeding complete'))
   .catch(() => process.exit(1));
 
